@@ -1,5 +1,6 @@
 #include "RenderArea.h"
 
+#include <osg/Material>
 #include <osg/MatrixTransform>
 #include <osgGA/TrackballManipulator>
 #include <osgGA/NodeTrackerManipulator>
@@ -11,7 +12,7 @@
 
 RenderArea::RenderArea()
 {
-    root_ = new osg::MatrixTransform();
+    root_ = new osg::Group();
 };
 
 void RenderArea::initializeGL()
@@ -21,13 +22,12 @@ void RenderArea::initializeGL()
 
     auto viewer = new osgViewer::Viewer();
     auto traits = new osg::GraphicsContext::Traits();
-    traits->width = this->width();
-    traits->height = this->height();
+    traits->width = this->width() * this->devicePixelRatio();
+    traits->height = this->height() * this->devicePixelRatio();
     traits->samples = 4;
-    traits->depth = 32;
-    traits->glContextVersion = "4.6";
+    traits->depth = 24;
+    traits->glContextVersion = "3.3";
     traits->inheritedWindowData = new osgViewer::GraphicsWindowWin32::WindowData((HWND)winId());
-    // auto gc = new osgViewer::GraphicsWindowWin32(traits);
     auto gc = new osgViewer::GraphicsWindowEmbedded(traits);
 
     auto camera = viewer->getCamera();
@@ -42,6 +42,7 @@ void RenderArea::initializeGL()
     viewer->setThreadingModel(osgViewer::ViewerBase::SingleThreaded);
     viewer->setSceneData(root_);
     viewer->setLightingMode(osg::View::HEADLIGHT);
+    
     viewer_ = viewer;
     gc_ = gc;
 }
@@ -55,6 +56,8 @@ void RenderArea::resizeGL(int w, int h)
 
     gc_->resized(0, 0, w, h);
     viewer_->getCamera()->setViewport(0, 0, w, h);
+    // viewer_->getCamera()->setProjectionMatrixAsOrtho(-w / 2., w / 2., -h / 2., h / 2., 1, 2000);
+    viewer_->getCamera()->setProjectionMatrixAsPerspective(30, w / static_cast<double>(h), 1., 1000);
     viewer_->getEventQueue()->windowResize(0, 0, w, h);
 }
 
@@ -89,8 +92,9 @@ void RenderArea::mousePressEvent(QMouseEvent *event)
         break;
     default:
         break;
-    }
-    gc_->getEventQueue()->mouseButtonPress(event->x(), event->y(), button);
+    } 
+    auto ratio = this->devicePixelRatio();
+    gc_->getEventQueue()->mouseButtonPress(event->x() * ratio, event->y() * ratio, button);
     QOpenGLWidget::mousePressEvent(event);
 }
 
@@ -111,7 +115,8 @@ void RenderArea::mouseMoveEvent(QMouseEvent *event)
     default:
         break;
     }
-    gc_->getEventQueue()->mouseMotion(event->x(), event->y(), button);
+    auto ratio = this->devicePixelRatio();
+    gc_->getEventQueue()->mouseMotion(event->x() * ratio, event->y() * ratio, button);
     QOpenGLWidget::mouseMoveEvent(event);
 }
 
@@ -132,7 +137,8 @@ void RenderArea::mouseReleaseEvent(QMouseEvent *event)
     default:
         break;
     }
-    gc_->getEventQueue()->mouseButtonRelease(event->x(), event->y(), button);
+    auto ratio = this->devicePixelRatio();
+    gc_->getEventQueue()->mouseButtonRelease(event->x() * ratio, event->y() * ratio, button);
     QOpenGLWidget::mouseReleaseEvent(event);
 }
 

@@ -1,6 +1,8 @@
+#pragma once
 #include <QOpenGLWidget>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <osg/Switch>
 #include <osgViewer/Viewer>
 
 class RenderArea : public QOpenGLWidget
