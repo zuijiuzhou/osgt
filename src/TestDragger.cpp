@@ -4,7 +4,9 @@ namespace
 {
     Box *createBox()
     {
-        return new Box(20, 10, 10);
+        auto box = new Box(20, 10, 10);
+        box->setMatrix(osg::Matrix::rotate(0.5, osg::Vec3d(0, 1, 2)) * osg::Matrix::translate(100, 0, 50));
+        return box;
     }
 
     TranslationDragger *createDragger(const GripPoint &gp)
@@ -67,6 +69,6 @@ void TestTranslationDragger(MainWindow *wnd)
                 }
             });
         draggers.insert({i, dragger});
-        wnd->renderArea()->addModel(dragger);
+        box->addChild(dragger);
     }
 }

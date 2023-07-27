@@ -227,6 +227,7 @@
         "io_utils": "cpp",
         "observer_ptr": "cpp",
         "os_utils": "cpp",
-        "qwheelevent": "cpp"
+        "qwheelevent": "cpp",
+        "linesegmentintersector": "cpp"
     }
 }
